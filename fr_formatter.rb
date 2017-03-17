@@ -1,14 +1,22 @@
 require 'csv'
 customer_list = CSV.read(ARGV[0])
 
+if ARGV[1] == nil
+  file_name = ARGV[0].dup
+  file_name.prepend("fr_formatted_")
+else
+  file_name = ARGV[1].dup
+end
+
 #Sort By Email And Remove Nil Values##################
-customer_list.sort! { |a, b| a[11] <=> b[11] }
+customer_list.sort! { |a, b| a[11].to_s <=> b[11].to_s }
 customer_list.each do |line|
   line.delete_if {|element| element === nil}
 end
 
+#Grouping By Same Email Address And Reverse Sort By Age
+##If Statement Removes Keys From Grouping
 fam_list = []
-
 customer_list.group_by(&:last).each do |fam|
   fam.each do |person|
     if person.class == Array
@@ -19,7 +27,7 @@ customer_list.group_by(&:last).each do |fam|
   end
 end
 
-CSV.open("test_wCaps.csv", "w+") do |csv|
+CSV.open(file_name, "w+") do |csv|
   fam_list.each do |fam|
     arr = []
     parent = fam[0]
